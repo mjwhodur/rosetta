@@ -6,9 +6,8 @@ description = "An effort to bring all Erlang Standard Libraries to Gleam"
 # Fill out these fields if you intend to generate HTML documentation or publish
 # your project to the Hex package manager.
 #
-# description = ""
-# licences = ["Apache-2.0"]
-# repository = { type = "github", user = "", repo = "" }
+licences = ["Apache-2.0"]
+repository = { type = "github", user = "mjwhodur", repo = "rosetta" }
 # links = [{ title = "Website", href = "" }]
 #
 # For a full reference of all the available options, you can have a look at
