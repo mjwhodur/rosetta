@@ -1,6 +1,6 @@
-import datetime
 import gleeunit
 import gleeunit/should
+import rosetta/datetime
 
 @external(erlang, "erlang", "date")
 fn erl_date() -> #(Int, Int, Int)
