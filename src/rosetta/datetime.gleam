@@ -1,4 +1,4 @@
-import internal/erl/stdlib/datetime_erl
+import rosetta/internal/erl/stdlib/datetime_erl
 
 /// Alias for year
 pub type Year =
