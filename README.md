@@ -6,3 +6,6 @@
 ## Rosetta library
 
 ## Modules
+
+### Datetime
+Provides high level interface to native Clock
