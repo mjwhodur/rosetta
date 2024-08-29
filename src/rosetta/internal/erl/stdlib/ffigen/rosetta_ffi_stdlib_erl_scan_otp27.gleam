@@ -598,10 +598,10 @@ pub fn ext_erl_ffigen_app_stdlib_erl_scan_scan_dot_6(
 ) -> Dynamic
 
 /// erl_scan:COLUMN
-/// COLUMN to ext_erl_ffigen_erl_scan_column_1 binding generated automatically by rosettaffigen 
-/// This function IS NOT DESIGNED for general use.
-@external(erlang, "erl_scan", "COLUMN")
-pub fn ext_erl_ffigen_app_stdlib_erl_scan_column_1(arg0: Dynamic) -> Dynamic
+// /// COLUMN to ext_erl_ffigen_erl_scan_column_1 binding generated automatically by rosettaffigen 
+// /// This function IS NOT DESIGNED for general use.
+// @external(erlang, "erl_scan", "COLUMN")
+// pub fn ext_erl_ffigen_app_stdlib_erl_scan_column_1(arg0: Dynamic) -> Dynamic
 
 /// erl_scan:format_error
 /// format_error to ext_erl_ffigen_erl_scan_format_error_1 binding generated automatically by rosettaffigen 

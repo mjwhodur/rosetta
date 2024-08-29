@@ -125,22 +125,22 @@ pub fn ext_erl_ffigen_app_stdlib_sofs_partition3_n_7(
   arg6: Dynamic,
 ) -> Dynamic
 
-/// sofs:family_difference
-/// family_difference to ext_erl_ffigen_sofs_family_difference_2 binding generated automatically by rosettaffigen 
-/// This function IS NOT DESIGNED for general use.
-@external(erlang, "sofs", "family_difference")
-pub fn ext_erl_ffigen_app_stdlib_sofs_family_difference_2(
-  arg0: Dynamic,
-  arg1: Dynamic,
-) -> Dynamic
+// /// sofs:family_difference
+// /// family_difference to ext_erl_ffigen_sofs_family_difference_2 binding generated automatically by rosettaffigen 
+// /// This function IS NOT DESIGNED for general use.
+// @external(erlang, "sofs", "family_difference")
+// pub fn ext_erl_ffigen_app_stdlib_sofs_family_difference_2(
+//   arg0: Dynamic,
+//   arg1: Dynamic,
+// ) -> Dynamic
 
-/// sofs:family_to_digraph
-/// family_to_digraph to ext_erl_ffigen_sofs_family_to_digraph_1 binding generated automatically by rosettaffigen 
-/// This function IS NOT DESIGNED for general use.
-@external(erlang, "sofs", "family_to_digraph")
-pub fn ext_erl_ffigen_app_stdlib_sofs_family_to_digraph_1(
-  arg0: Dynamic,
-) -> Dynamic
+// /// sofs:family_to_digraph
+// /// family_to_digraph to ext_erl_ffigen_sofs_family_to_digraph_1 binding generated automatically by rosettaffigen 
+// /// This function IS NOT DESIGNED for general use.
+// @external(erlang, "sofs", "family_to_digraph")
+// pub fn ext_erl_ffigen_app_stdlib_sofs_family_to_digraph_1(
+//   arg0: Dynamic,
+// ) -> Dynamic
 
 /// sofs:family_intersection
 /// family_intersection to ext_erl_ffigen_sofs_family_intersection_2 binding generated automatically by rosettaffigen 
@@ -882,15 +882,15 @@ pub fn ext_erl_ffigen_app_stdlib_sofs_make_element_2(
   arg1: Dynamic,
 ) -> Dynamic
 
+// /// This function IS NOT DESIGNED for general use.
+// @external(erlang, "sofs", "FAMILY")
+// pub fn ext_erl_ffigen_app_stdlib_sofs_family_2(
+//   arg0: Dynamic,
+//   arg1: Dynamic,
+// ) -> Dynamic
+
 /// sofs:FAMILY
 /// FAMILY to ext_erl_ffigen_sofs_family_2 binding generated automatically by rosettaffigen 
-/// This function IS NOT DESIGNED for general use.
-@external(erlang, "sofs", "FAMILY")
-pub fn ext_erl_ffigen_app_stdlib_sofs_family_2(
-  arg0: Dynamic,
-  arg1: Dynamic,
-) -> Dynamic
-
 /// sofs:constant_function
 /// constant_function to ext_erl_ffigen_sofs_constant_function_2 binding generated automatically by rosettaffigen 
 /// This function IS NOT DESIGNED for general use.
@@ -1158,11 +1158,11 @@ pub fn ext_erl_ffigen_app_stdlib_sofs_family_domain_1(arg0: Dynamic) -> Dynamic
 @external(erlang, "sofs", "is_no_lists")
 pub fn ext_erl_ffigen_app_stdlib_sofs_is_no_lists_1(arg0: Dynamic) -> Dynamic
 
-/// sofs:is_set
-/// is_set to ext_erl_ffigen_sofs_is_set_1 binding generated automatically by rosettaffigen 
-/// This function IS NOT DESIGNED for general use.
-@external(erlang, "sofs", "is_set")
-pub fn ext_erl_ffigen_app_stdlib_sofs_is_set_1(arg0: Dynamic) -> Dynamic
+// /// sofs:is_set
+// /// is_set to ext_erl_ffigen_sofs_is_set_1 binding generated automatically by rosettaffigen 
+// /// This function IS NOT DESIGNED for general use.
+// @external(erlang, "sofs", "is_set")
+// pub fn ext_erl_ffigen_app_stdlib_sofs_is_set_1(arg0: Dynamic) -> Dynamic
 
 /// sofs:drestriction
 /// drestriction to ext_erl_ffigen_sofs_drestriction_2 binding generated automatically by rosettaffigen 

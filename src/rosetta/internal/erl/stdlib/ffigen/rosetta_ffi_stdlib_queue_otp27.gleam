@@ -323,11 +323,11 @@ pub fn ext_erl_ffigen_app_stdlib_queue_fun_2(
   arg1: Dynamic,
 ) -> Dynamic
 
-/// queue:Fun
-/// Fun to ext_erl_ffigen_queue_fun_1 binding generated automatically by rosettaffigen 
-/// This function IS NOT DESIGNED for general use.
-@external(erlang, "queue", "Fun")
-pub fn ext_erl_ffigen_app_stdlib_queue_fun_1(arg0: Dynamic) -> Dynamic
+// /// queue:Fun
+// /// Fun to ext_erl_ffigen_queue_fun_1 binding generated automatically by rosettaffigen 
+// /// This function IS NOT DESIGNED for general use.
+// @external(erlang, "queue", "Fun")
+// pub fn ext_erl_ffigen_app_stdlib_queue_fun_1(arg0: Dynamic) -> Dynamic
 
 /// queue:delete
 /// delete to ext_erl_ffigen_queue_delete_2 binding generated automatically by rosettaffigen 
