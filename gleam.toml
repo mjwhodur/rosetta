@@ -1,5 +1,5 @@
 name = "rosetta"
-version = "0.0.2"
+version = "0.1.0"
 
 description = "An effort to bring all Erlang Standard Libraries to Gleam"
 
