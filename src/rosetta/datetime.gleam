@@ -16,7 +16,7 @@ pub type Day =
 pub type Hour =
   Int
 
-/// Alias for Minute 
+/// Alias for Minute
 pub type Minute =
   Int
 
@@ -60,4 +60,8 @@ pub fn timestamp() -> Timestamp {
 /// Utility function. Converts NaiveDate into tuple.
 pub fn naivedate_to_tuple(d: NaiveDate) -> #(Int, Int, Int) {
   #(d.year, d.month, d.day)
+}
+
+pub fn nilfunc() -> Nil {
+  Nil
 }
