@@ -6,6 +6,11 @@ import gleam/dynamic.{type Dynamic}
 import gleam/erlang
 import gleam/erlang/atom.{type Atom}
 import gleam/erlang/node.{type Node}
+import gleam/string
+
+pub type ConversionError {
+  NegativeIntegerError
+}
 
 /// This is left here for the sake of brevity. It represents the Erlang Any Type
 pub type Any
@@ -149,7 +154,7 @@ pub fn r_floor_1(value: Number) -> Int
 /// Returns `String` that represents the code that created Fun
 @deprecated("This function is lacking tests. Likely buggy implementation")
 @external(erlang, "erlang", "fun_to_list")
-pub fn r_fun_to_list_1(value: Dynamic) -> String
+pub fn r_fun_to_list_1(value: Any) -> String
 
 /// hd/1
 @deprecated("Likely buggy implementation")
@@ -173,52 +178,52 @@ pub fn r_integer_to_binary_2(val: Any, val2: Any) -> BitArray
 /// is_atom/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_atom")
-pub fn r_is_atom_1(value: Dynamic) -> Bool
+pub fn r_is_atom_1(value: Any) -> Bool
 
 /// is_binary/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_binary")
-pub fn r_is_binary_1(value: Dynamic) -> Bool
+pub fn r_is_binary_1(value: Any) -> Bool
 
 /// is_bitstring/1
 @deprecated("Gleam's standard library has tool for that: gleam/bitstring")
 @external(erlang, "erlang", "is_bitstring")
-pub fn r_is_bitstring_1(value: Dynamic) -> Bool
+pub fn r_is_bitstring_1(value: Any) -> Bool
 
 /// is_boolean/1
 @deprecated("Gleam's standard library has tool for that: gleam/dynamic/bool")
 @external(erlang, "erlang", "is_boolean")
-pub fn r_is_boolean_1(value: Dynamic) -> Bool
+pub fn r_is_boolean_1(value: Any) -> Bool
 
 /// is_float/1
 @deprecated("Gleam's standard library has tool for that: gleam/dynamic/float")
 @external(erlang, "erlang", "is_float")
-pub fn r_is_float_1(value: Dynamic) -> Bool
+pub fn r_is_float_1(value: Any) -> Bool
 
 /// is_function/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_function")
-pub fn r_is_function_1(value: Dynamic) -> Bool
+pub fn r_is_function_1(value: Any) -> Bool
 
 /// is_function/2
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_function")
-pub fn r_is_function_2(value1: Dynamic, value2: Dynamic) -> Bool
+pub fn r_is_function_2(value1: Any, value2: Any) -> Bool
 
 /// is_integer/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_integer")
-pub fn r_is_integer_1(value1: Dynamic) -> Bool
+pub fn r_is_integer_1(value1: Any) -> Bool
 
 /// is_list/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_list")
-pub fn r_is_list_1(value1: Dynamic) -> Bool
+pub fn r_is_list_1(value1: Any) -> Bool
 
 /// is_map/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_map")
-pub fn r_is_map_1(value: Dynamic) -> Bool
+pub fn r_is_map_1(value: Any) -> Bool
 
 /// is_map_key/2
 @external(erlang, "erlang", "is_map_key")
@@ -227,17 +232,17 @@ pub fn r_is_map_key_2(key: Atom, map: RMap) -> Bool
 /// is_number/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_number")
-pub fn r_is_number_1(value: Dynamic) -> Bool
+pub fn r_is_number_1(value: Any) -> Bool
 
 /// is_pid/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_pid")
-pub fn r_is_pid_1(value: Dynamic) -> Bool
+pub fn r_is_pid_1(value: Any) -> Bool
 
 /// is_port/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_port")
-pub fn r_is_port_1(value: Dynamic) -> Bool
+pub fn r_is_port_1(value: Any) -> Bool
 
 // @external(erlang, "erlang", "is_record")
 /// is_record/2
@@ -254,12 +259,12 @@ pub fn r_is_record_3(term: Term, record_tag: Atom, size: NonNegInteger) -> Bool
 // is_reference/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_reference")
-pub fn r_is_reference_1(value: Dynamic) -> Bool
+pub fn r_is_reference_1(value: Any) -> Bool
 
 /// is_tuple/1
 @deprecated("Lacking tests")
 @external(erlang, "erlang", "is_tuple")
-pub fn r_is_tuple_1(value: Dynamic) -> Bool
+pub fn r_is_tuple_1(value: Any) -> Bool
 
 // length/1
 @deprecated("Lacking tests")
@@ -869,6 +874,7 @@ pub type TracePatternFlag =
 
 pub type TracePatternMfa =
   ROSETTABROKEN
+
 // ERLANG CHECKSUM FUNCTIONS
 //
 // Checksum
@@ -1007,6 +1013,7 @@ pub type TracePatternMfa =
 // unregister/1
 // whereis/1
 // yield/0
+
 // System
 
 // halt/0
@@ -1047,3 +1054,32 @@ pub type TracePatternMfa =
 // timestamp/0
 // universaltime/0
 // universaltime_to_localtime/1
+
+@external(erlang, "rosetta_core_ffi", "ident")
+fn idx_to_nonnegative_int(value: Int) -> NonNegInteger
+
+@external(erlang, "rosetta_core_ffi", "ident")
+fn idx_neg_to_integer(value: NonNegInteger) -> Int
+
+@external(erlang, "rosetta_core_ffi", "ident")
+fn idx_number_to_integer(value: Number) -> Int
+
+@external(erlang, "rosetta_core_ffi", "ident")
+fn idx_to_any_to_number(value: Any) -> Number
+
+pub fn number_to_float(num: Number) -> Float {
+  todo
+}
+
+pub fn number_to_int(num: Number) -> Int {
+  todo
+}
+
+pub fn int_to_nonnegative_int(
+  value: Int,
+) -> Result(NonNegInteger, ConversionError) {
+  case value >= 0 {
+    True -> Ok(idx_to_nonnegative_int(value))
+    False -> Error(NegativeIntegerError)
+  }
+}

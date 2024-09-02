@@ -26,7 +26,8 @@ matches the following:
 - BitArray -> ???
 - Nil -> nil. (It's an atom!)
 
-- AnythingElse (simple) -> any() (in typespec)
+
+- AnythingElse (simple) -> any() (in typespec) ()
 
 ## Mapping the Gleam compund types to Erlang
 ### Basic Gleam Types
