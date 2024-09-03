@@ -3,14 +3,16 @@
 /////// Functions prepended with r_ are their erlang counterparts, translated here for brevity
 
 import gleam/dynamic.{type Dynamic}
-import gleam/erlang
 import gleam/erlang/atom.{type Atom}
 import gleam/erlang/node.{type Node}
-import gleam/string
+import gleam/erlang/process
 
 pub type ConversionError {
   NegativeIntegerError
 }
+
+pub type RPid =
+  process.Pid
 
 /// It represents the Erlang `any/0` Type
 pub type Any
@@ -41,52 +43,92 @@ pub type Byte
 /// An ASCII/Unicode character.
 pub type Char
 
+/// `dynamic/0`
 pub type RDynamic
 
+/// Alias for Float.
 pub type RFloat =
   Float
 
+/// `function/0`
 pub type RFunction
 
+/// Alias for Identifier
 pub type RIdentifier =
   Identifier
 
+/// `integer/0`, equivalent of `Int` in Gleam.
+/// The "integer" type in Erlang has two subvariants: `non_neg_integer` and `neg_integer`.
+/// Those are defined separately.
 pub type Integer =
   Int
 
+///A binary or list containing bytes and/or iodata.
+///This datatype is used to represent data that is meant to be output using any I/O module. For example: file:write/2 or gen_tcp:send/2.
+///To convert an iodata/0 term to binary/0 you can use iolist_to_binary/2. To transcode a string/0 or unicode:chardata/0 to iodata/0 you can use unicode:characters_to_binary/1.
 pub type IoData
 
+///-type iolist() :: maybe_improper_list(byte() | binary() | iolist(), binary() | []).
+///A list containing bytes and/or iodata.
+///
+///This datatype is used to represent data that is meant to be output using any I/O module. For example: file:write/2 or gen_tcp:send/2.
+///
+///In most use cases you want to use iodata/0 instead of this type.
+///
 pub type IoList
 
+/// `list/0`. Doesn't have counterpart in Gleam. This may be a list of different terms.
 pub type RList0
 
-pub type RList1
+/// `list/1`. Equivalent to `List` in Gleam. Lists in Gleam require static typing.
+pub type RList1(t) =
+  List(t)
 
+/// -type map() :: #{any() => any()}.
+/// An Erlang map containing any number of key and value associations.
+/// The Gleam Dict type conforms partially. Gleam's dict requires all values to be of the same type.
+/// And we cannot assure that all the items will be of this type.
 pub type RMap
 
+/// An Erlang list that is not guaranteed to end with a [], and where the list elements can be of any type.
 pub type MaybeImproperList
 
+///
 pub type MaybeImproperList2
 
+/// A three-tuple representing a Module:Function/Arity function signature.
 pub type Mfa
 
+/// An Erlang module represented by an atom.
 pub type Module
 
+/// A negative integer. Negative integers can be read by Gleam's Int type.
+/// That is provided here for compatibility and portability reasons.
+/// If we know that a certain value is negative, we should be using that.
+/// FIXME: Lacking implementation of conversion functions.
 pub type NegInteger
 
+/// The type used to show that a function will never return a value, that is it will always throw an exception.
 pub type NoReturn
 
+/// Erlang Node represented by an atom. Gleam/OTP and Gleam/Erlang have few
+/// functions handling that. This type is left here for the compatibility reasons.
 pub type RNode =
   Node
 
+/// A non-negative integer, that is any positive integer or 0. FIXME: add conversions
 pub type NonNegInteger
 
+/// Integer greater than 0. FIXME: Add Conversions
 pub type PosInteger
 
+/// `none/0`
 pub type RNone
 
+/// `binary/0` (`Binary`) that contains some data.
 pub type NonEmptyBinary
 
+/// Non-empty `bitstring/0` (`BitArray` in Gleam)
 pub type NonEmptyBitString
 
 pub type NonEmptyImproperList
@@ -126,6 +168,7 @@ pub type RTimeout
 /// In order not to clash with Gleam's tuple, it's an Erlang Tuple
 pub type RTuple
 
+/// Our crazy internal type, to sign that something is not yet ready.
 pub type HelpMeNotTyped
 
 ///append_element/2
@@ -648,7 +691,8 @@ pub fn r_float_to_list_1() -> Integer
 @external(erlang, "erlang", "unique_integer")
 pub fn r_float_to_list_2() -> Integer
 
-/// Left here intentionally
+/// Represents a type that has no implementation yet
+/// or has known compatibility issues.
 pub type ROSETTABROKEN
 
 /// This will require glueing code
@@ -790,7 +834,7 @@ pub type PriorityLevel {
 pub type ProcessInfoItem =
   ROSETTABROKEN
 
-/// OMITED FOR SANITY XD
+/// OMITED FOR SANITY
 pub type ProcessInfoResultItem =
   ROSETTABROKEN
 
