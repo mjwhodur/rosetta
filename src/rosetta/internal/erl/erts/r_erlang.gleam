@@ -12,23 +12,33 @@ pub type ConversionError {
   NegativeIntegerError
 }
 
-/// This is left here for the sake of brevity. It represents the Erlang Any Type
+/// It represents the Erlang `any/0` Type
 pub type Any
 
+/// Represents `arity/0`
 pub type Arity
 
+/// Represents `binary/0`. Binary (`binary/0`) is a `BitString` of size divisible by 8.
 pub type Binary
 
+/// Represents `bitstring/0`
 pub type RBitString
 
+/// Represents `bitstring/0`. BitString in Erlang is equivalent to what we have in Gleam in BitArray.
+///
 pub type BitString =
   BitArray
 
+/// Boolean is an equivalent of `Bool` in Gleam, so it's an alias. It is left here for
+/// consistency reasons with the Erlang documentation.
 pub type Boolean =
   Bool
 
+/// `-type byte() :: 0..255.`
+/// Byte of data, represented by integer.
 pub type Byte
 
+/// An ASCII/Unicode character.
 pub type Char
 
 pub type RDynamic
@@ -1059,7 +1069,10 @@ pub type TracePatternMfa =
 fn idx_to_nonnegative_int(value: Int) -> NonNegInteger
 
 @external(erlang, "rosetta_core_ffi", "ident")
-fn idx_neg_to_integer(value: NonNegInteger) -> Int
+fn idx_nonneg_to_integer(value: NonNegInteger) -> Int
+
+@external(erlang, "rosetta_core_ffi", "ident")
+fn idx_neg_to_integer(value: NegInteger) -> Int
 
 @external(erlang, "rosetta_core_ffi", "ident")
 fn idx_number_to_integer(value: Number) -> Int
