@@ -1,5 +1,5 @@
 name = "rosetta"
-version = "0.2.0"
+version = "0.1.0"
 
 description = "An effort to bring all Erlang Standard Libraries to Gleam"
 
@@ -14,9 +14,9 @@ repository = { type = "github", user = "mjwhodur", repo = "rosetta" }
 # https://gleam.run/writing-gleam/gleam-toml/.
 
 internal_modules = [
-  "rosetta/internal",
-  "internal/*",
-  "rosetta/internal/**/*",
+    "rosetta/internal",
+    "internal/*",
+    # "rosetta/internal/**/*",
 ]
 
 
