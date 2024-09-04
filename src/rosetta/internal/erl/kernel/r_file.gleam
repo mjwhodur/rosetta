@@ -1,4 +1,5 @@
 import gleam/dynamic
+import rosetta/improper_results.{type ImproperResultOk}
 import rosetta/internal/erl/erts/r_erlang
 import rosetta/internal/erl/stdlib/r_calendar
 
@@ -223,6 +224,10 @@ pub type PosixError {
   Exdev
   /// Not from POSIX. It's an erlang atom that may be thrown in certain scenarios.
   Badarg
+  /// Not from POSIX. FIXME: Document this.
+  Terminated
+  /// Not from POSIX. When you reach the system_limit
+  SystemLimit
 }
 
 // Types
@@ -320,301 +325,447 @@ pub type SendfileOption {
 /// `advise/4`
 /// `advise/4` can be used to announce an intention to access file data in a specific pattern in the future, thus allowing the operating system to perform appropriate optimizations.
 /// On some platforms, this function might have no effect.
-/// FIXME: Can result in `badarg` which is not yet supported here.
+/// UNSAFE.
 @external(erlang, "file", "advise")
 pub fn r_advise_4(
   iodevice iodevice: IoDevice,
   offset offset: Int,
   length length: Int,
   advise advise: PosixFileAdvise,
-) -> Result(Nil, PosixError)
+) -> ImproperResultOk(PosixError)
 
 /// allocate/3
+/// allocate/3 can be used to preallocate space for a file.
+/// This function only succeeds in platforms that provide this feature.
+/// UNSAFE: This function is unsafe. `offset` and `length` should provide non-negative integer.
 @external(erlang, "file", "allocate")
 pub fn r_allocate_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  file file: IoDevice,
+  offset offset: Int,
+  length length: Int,
+) -> ImproperResultOk(PosixError)
 
 /// change_group/2
+/// Changes group of a file. See write_file_info/2.
+/// Wee should use name_all(), but for compatibility reasons we defailt to String
+/// mode has to be positive integer. We don't test that here.
+/// UNSAFE
 @external(erlang, "file", "change_group")
-pub fn r_change_group_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_change_group_2(
+  filename filename: String,
+  gid gid: Int,
+) -> ImproperResultOk(PosixError)
 
 /// change_mode/2
+/// Changes permissions of a file. See write_file_info/2.
+/// Caveats:: we're using String for filename only.
+/// UNSAFE: mode is not checked.
 @external(erlang, "file", "change_mode")
-pub fn r_change_mode_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_change_mode_2(
+  filename filename: String,
+  mode mode: Int,
+) -> ImproperResultOk(PosixError)
 
 /// change_owner/2
 @external(erlang, "file", "change_owner")
-pub fn r_change_owner_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_change_owner_2(
+  filename filename: String,
+  uid uid: Int,
+) -> ImproperResultOk(PosixError)
 
 /// change_owner/3
 @external(erlang, "file", "change_owner")
 pub fn r_change_owner_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  filename filename: NameAll,
+  uid uid: Int,
+  gid gid: Int,
+) -> ImproperResultOk(PosixError)
 
 /// change_time/2
 @external(erlang, "file", "change_time")
-pub fn r_change_time_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_change_time_2(
+  filename filename: NameAll,
+  mtime mtime: r_calendar.Datetime,
+) -> ImproperResultOk(PosixError)
 
 /// change_time/3
 @external(erlang, "file", "change_time")
 pub fn r_change_time_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  filename filename: NameAll,
+  atime atime: r_calendar.Datetime,
+  mtime mtime: r_calendar.Datetime,
+) -> ImproperResultOk(PosixError)
 
 /// close/1
 @external(erlang, "file", "close")
-pub fn r_close_1(arg1: Placeholder) -> Placeholder
+pub fn r_close_1(iodevice iodevice: IoDevice) -> ImproperResultOk(PosixError)
 
 /// consult/1
 @external(erlang, "file", "consult")
-pub fn r_consult_1(arg1: Placeholder) -> Placeholder
+pub fn r_consult_1(
+  filename filename: NameAll,
+) -> Result(r_erlang.Any, PosixError)
 
 /// copy/2
+/// FIXME: Missing full implementation
 @external(erlang, "file", "copy")
-pub fn r_copy_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_copy_2(
+  src src: IoDevice,
+  dest dest: IoDevice,
+) -> Result(Int, PosixError)
 
 /// copy/3
+/// FIXME: Missing full implementation
 @external(erlang, "file", "copy")
 pub fn r_copy_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  src src: IoDevice,
+  dest dest: IoDevice,
+  bytecount bytecount: Int,
+) -> Result(Int, PosixError)
 
 /// datasync/1
 @external(erlang, "file", "datasync")
-pub fn r_datasync_1(arg1: Placeholder) -> Placeholder
+pub fn r_datasync_1(iodevice iodevice: IoDevice) -> ImproperResultOk(PosixError)
 
 /// del_dir/1
 @external(erlang, "file", "del_dir")
-pub fn r_del_dir_1(arg1: Placeholder) -> Placeholder
+pub fn r_del_dir_1(dir dir: NameAll) -> ImproperResultOk(PosixError)
 
 /// del_dir_r/1
 @external(erlang, "file", "del_dir_r")
-pub fn r_del_dir_r_1(arg1: Placeholder) -> Placeholder
+pub fn r_del_dir_r_1(file file: NameAll) -> ImproperResultOk(PosixError)
 
 /// delete/1
 @external(erlang, "file", "delete")
-pub fn r_delete_1(arg1: Placeholder) -> Placeholder
+pub fn r_delete_1(file file: NameAll) -> ImproperResultOk(PosixError)
 
 /// delete/2
+/// FIXME: missing functionality of DeleteOption
 @external(erlang, "file", "delete")
-pub fn r_delete_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_delete_2(
+  filename filename: NameAll,
+  options options: List(DeleteOption),
+) -> ImproperResultOk(PosixError)
 
 /// eval/1
 @external(erlang, "file", "eval")
-pub fn r_eval_1(arg1: Placeholder) -> Placeholder
+pub fn r_eval_1(name name: NameAll) -> ImproperResultOk(PosixError)
 
 /// eval/2
 @external(erlang, "file", "eval")
-pub fn r_eval_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_eval_2(
+  arg1: NameAll,
+  arg2: Placeholder,
+) -> ImproperResultOk(PosixError)
 
 /// format_error/1
 @external(erlang, "file", "format_error")
-pub fn r_format_error_1(arg1: Placeholder) -> Placeholder
+pub fn r_format_error_1(reason reason: PosixError) -> String
 
 /// get_cwd/0
+/// The return type should be Result(Filename, )
 @external(erlang, "file", "get_cwd")
-pub fn r_get_cwd_0() -> Placeholder
+pub fn r_get_cwd_0() -> Result(String, PosixError)
 
 /// get_cwd/1
+/// UNSAFE
 @external(erlang, "file", "get_cwd")
-pub fn r_get_cwd_1(arg1: Placeholder) -> Placeholder
+pub fn r_get_cwd_1(drive drive: String) -> Result(Filename, PosixError)
 
 /// list_dir/1
 @external(erlang, "file", "list_dir")
-pub fn r_list_dir_1(arg1: Placeholder) -> Placeholder
+pub fn r_list_dir_1(dir dir: NameAll) -> Result(List(Filename), PosixError)
 
 /// list_dir_all/1
 @external(erlang, "file", "list_dir_all")
-pub fn r_list_dir_all_1(arg1: Placeholder) -> Placeholder
+pub fn r_list_dir_all_1(
+  dir dir: NameAll,
+) -> Result(List(FilenameAll), PosixError)
 
 /// make_dir/1
 @external(erlang, "file", "make_dir")
-pub fn r_make_dir_1(arg1: Placeholder) -> Placeholder
+pub fn r_make_dir_1(dirname dirname: NameAll) -> ImproperResultOk(PosixError)
 
 /// make_link/2
 @external(erlang, "file", "make_link")
-pub fn r_make_link_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_make_link_2(
+  existing existing: NameAll,
+  new new: NameAll,
+) -> ImproperResultOk(PosixError)
 
 /// make_symlink/2
 @external(erlang, "file", "make_symlink")
-pub fn r_make_symlink_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_make_symlink_2(
+  existing existing: NameAll,
+  new new: NameAll,
+) -> ImproperResultOk(PosixError)
+
+pub type NativeNameEncoding {
+  Latin1
+  Utf8
+}
 
 /// native_name_encoding/0
 @external(erlang, "file", "native_name_encoding")
-pub fn r_native_name_encoding_0() -> Placeholder
+pub fn r_native_name_encoding_0() -> NativeNameEncoding
+
+/// FIXME: Lacking implementation
+pub type Filemodes
+
+/// FIXME: This probably shall have better name...
+/// It's NameAll or IoData
+pub type File
 
 /// open/2
+/// FIXME: Rewrite this multiple times to workaround with different issues
 @external(erlang, "file", "open")
-pub fn r_open_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_open_2(
+  file file: File,
+  modes modes: Filemodes,
+) -> Result(IoDevice, PosixError)
 
 /// path_consult/2
+/// FIXME: Probably proken return
 @external(erlang, "file", "path_consult")
-pub fn r_path_consult_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_path_consult_2(
+  path path: List(NameAll),
+  filename filename: NameAll,
+) -> Result(#(List(r_erlang.Any), NameAll), PosixError)
 
 /// path_eval/2
 @external(erlang, "file", "path_eval")
-pub fn r_path_eval_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_path_eval_2(
+  path path: List(NameAll),
+  filename filename: NameAll,
+) -> Result(FilenameAll, PosixError)
 
 /// path_open/3
+/// FIXME (limitation): I don't support mode `directory`
 @external(erlang, "file", "path_open")
 pub fn r_path_open_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  path path: List(NameAll),
+  filename filename: NameAll,
+  modes modes: Mode,
+) -> Result(#(IoDevice, FilenameAll), PosixError)
 
 /// path_script/2
+/// FIXME: I have broken return type...
 @external(erlang, "file", "path_script")
-pub fn r_path_script_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_path_script_2(
+  path path: List(NameAll),
+  filename filename: NameAll,
+) -> Result(Placeholder, PosixError)
 
 /// path_script/3
+/// FIXME: I have broken type in bindings. I'm usable, if you'd convert `erl_eval:binding_struct()` to Any
 @external(erlang, "file", "path_script")
 pub fn r_path_script_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  path path: List(NameAll),
+  filename filename: NameAll,
+  binding bindings: r_erlang.Any,
+) -> Result(Placeholder, PosixError)
 
 /// position/2
 @external(erlang, "file", "position")
-pub fn r_position_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_position_2(
+  iodevice iodevice: IoDevice,
+  location location: Location,
+) -> Result(Int, PosixError)
+
+/// string(), binary(), or `eof` atom
+/// FIXME: Needs a converter function
+pub type RawData
 
 /// pread/2
+/// UNSAFE: Parameter locnums accepts only non-negative-int
 @external(erlang, "file", "pread")
-pub fn r_pread_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_pread_2(
+  iodevice: IoDevice,
+  locnums: List(#(Location, Int)),
+) -> Result(List(RawData), PosixError)
 
 /// pread/3
+/// UNSAFE: Parameter `number` accepts only non-negative-int
 @external(erlang, "file", "pread")
 pub fn r_pread_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  iodevice iodevice: Placeholder,
+  location location: Location,
+  number number: Int,
+) -> Result(Placeholder, PosixError)
 
 /// pwrite/2
 @external(erlang, "file", "pwrite")
-pub fn r_pwrite_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_pwrite_2(
+  iodevice: IoDevice,
+  locbytes: List(#(Location, r_erlang.IoData)),
+) -> ImproperResultOk(#(Int, PosixError))
 
 /// pwrite/3
 @external(erlang, "file", "pwrite")
 pub fn r_pwrite_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  iodevice iodevice: IoDevice,
+  location location: Location,
+  bytes bytes: r_erlang.IoData,
+) -> ImproperResultOk(PosixError)
+
+/// ReadDevice
+/// io_device() | atom() | pid() | standard_io() | standard_error() | user().
+pub type ReadDevice
 
 /// read/2
+/// FIXME: Result - rawdata may give only string or binary
+/// FIXME: it may result in no_translation. Runtime error...
+/// FIXME: Runtime error when EOF.
+/// It is recommended to use "read_file" instead. At least for now.
+/// UNSAFE: number nust be > 0
 @external(erlang, "file", "read")
-pub fn r_read_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_read_2(
+  iodevice iodevice: ReadDevice,
+  number number: Int,
+) -> Result(RawData, PosixError)
 
 /// read_file/1
 @external(erlang, "file", "read_file")
-pub fn r_read_file_1(arg1: Placeholder) -> Placeholder
+pub fn r_read_file_1(
+  filename filename: NameAll,
+) -> Result(r_erlang.Binary, PosixError)
 
 /// read_file/2
+/// FIXME: ReadFileOption may be broken type...
+/// It has only "raw" atom.
 @external(erlang, "file", "read_file")
-pub fn r_read_file_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_read_file_2(
+  filename filename: NameAll,
+  opts opts: List(ReadFileOption),
+) -> Result(r_erlang.Binary, PosixError)
 
 /// read_file_info/1
+/// name_all() | io_device(),
+/// FIXME: Split or whatever...
 @external(erlang, "file", "read_file_info")
-pub fn r_read_file_info_1(arg1: Placeholder) -> Placeholder
+pub fn r_read_file_info_1(
+  file file: Placeholder,
+) -> Result(FileInfo, PosixError)
 
 /// read_file_info/2
+/// FIXME: I'm broken. Split Me
 @external(erlang, "file", "read_file_info")
-pub fn r_read_file_info_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_read_file_info_2(
+  file file: Placeholder,
+  opts opts: Placeholder,
+) -> Result(FileInfo, PosixError)
 
 /// read_line/1
 @external(erlang, "file", "read_line")
-pub fn r_read_line_1(arg1: Placeholder) -> Placeholder
+pub fn r_read_line_1(
+  iodeevice iodevice: Placeholder,
+) -> Result(RawData, PosixError)
 
 /// read_link/1
 @external(erlang, "file", "read_link")
-pub fn r_read_link_1(arg1: Placeholder) -> Placeholder
+pub fn r_read_link_1(name name: NameAll) -> Result(Filename, PosixError)
 
 /// read_link_all/1
 @external(erlang, "file", "read_link_all")
-pub fn r_read_link_all_1(arg1: Placeholder) -> Placeholder
+pub fn r_read_link_all_1(name name: NameAll) -> Result(Filename, PosixError)
 
 /// read_link_info/1
 @external(erlang, "file", "read_link_info")
-pub fn r_read_link_info_1(arg1: Placeholder) -> Placeholder
+pub fn r_read_link_info_1(name name: NameAll) -> Result(FileInfo, PosixError)
 
 /// read_link_info/2
 @external(erlang, "file", "read_link_info")
-pub fn r_read_link_info_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_read_link_info_2(
+  name name: NameAll,
+  opts opts: List(FileInfoOption),
+) -> Result(FileInfo, PosixError)
 
 /// rename/2
 @external(erlang, "file", "rename")
-pub fn r_rename_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_rename_2(
+  src src: NameAll,
+  dest dest: NameAll,
+) -> ImproperResultOk(PosixError)
 
 /// script/1
 @external(erlang, "file", "script")
-pub fn r_script_1(arg1: Placeholder) -> Placeholder
+pub fn r_script_1(name name: NameAll) -> Result(r_erlang.Any, PosixError)
 
 /// script/2
+/// FIXME: I'm lacking erl_eval module
 @external(erlang, "file", "script")
-pub fn r_script_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_script_2(
+  name name: NameAll,
+  bindings bindings: r_erlang.Any,
+) -> Result(r_erlang.Any, PosixError)
 
 /// sendfile/2
+/// FIXME: Lacking types for socket
 @external(erlang, "file", "sendfile")
-pub fn r_sendfile_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_sendfile_2(
+  filename filename: NameAll,
+  socket socket: r_erlang.Any,
+) -> Result(Int, PosixError)
 
 /// sendfile/5
+/// FIXME: this is broken
 @external(erlang, "file", "sendfile")
 pub fn r_sendfile_5(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-  arg4: Placeholder,
-  arg5: Placeholder,
-) -> Placeholder
+  rawfile rawfile: r_erlang.Any,
+  socket socket: r_erlang.Any,
+  offset offset: r_erlang.Any,
+  bytes bytes: r_erlang.Any,
+  opts opts: r_erlang.Any,
+) -> Result(Int, PosixError)
 
 /// set_cwd/1
+/// FIXME: I'm partially supported.
 @external(erlang, "file", "set_cwd")
-pub fn r_set_cwd_1(arg1: Placeholder) -> Placeholder
+pub fn r_set_cwd_1(dir dir: String) -> ImproperResultOk(PosixError)
 
 /// sync/1
 @external(erlang, "file", "sync")
-pub fn r_sync_1(arg1: Placeholder) -> Placeholder
+pub fn r_sync_1(iodevice iodevice: IoDevice) -> ImproperResultOk(PosixError)
 
 /// truncate/1
 @external(erlang, "file", "truncate")
-pub fn r_truncate_1(arg1: Placeholder) -> Placeholder
+pub fn r_truncate_1(iodevice iodevice: IoDevice) -> ImproperResultOk(PosixError)
 
 /// write/2
+/// FIXME: We do not support all types of writes, yet.
 @external(erlang, "file", "write")
-pub fn r_write_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_write_2(
+  iodevice iodevice: IoDevice,
+  bytes bytes: r_erlang.IoData,
+) -> ImproperResultOk(PosixError)
 
 /// write_file/2
+/// Writes the contents of the iodata term Bytes to file Filename. The file is created if it does not exist. If it exists, the previous contents are overwritten. Returns ok if successful, otherwise {error, Reason}.
 @external(erlang, "file", "write_file")
-pub fn r_write_file_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_write_file_2(
+  filename filename: NameAll,
+  bytes bytes: r_erlang.IoData,
+) -> ImproperResultOk(PosixError)
 
 /// write_file/3
 @external(erlang, "file", "write_file")
 pub fn r_write_file_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  filename filename: NameAll,
+  bytes bytes: r_erlang.IoData,
+  modes modes: List(Mode),
+) -> ImproperResultOk(PosixError)
 
 /// write_file_info/2
 @external(erlang, "file", "write_file_info")
-pub fn r_write_file_info_2(arg1: Placeholder, arg2: Placeholder) -> Placeholder
+pub fn r_write_file_info_2(
+  filename filename: NameAll,
+  fileinfo fileinfo: FileInfo,
+) -> ImproperResultOk(PosixError)
 
 /// write_file_info/3
 @external(erlang, "file", "write_file_info")
 pub fn r_write_file_info_3(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-) -> Placeholder
+  filename filename: NameAll,
+  fileinfo fileinfo: FileInfo,
+  opts opts: List(FileInfoOption),
+) -> ImproperResultOk(PosixError)

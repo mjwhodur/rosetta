@@ -2,6 +2,7 @@
 
 ## 0.2.0
 - Partially ported `file` for most basic operations
+- Adds `ImproperResultOk` with helper functions.
 
 ## 0.1.0
 - Ports `calendar`. Calendar has still many unsafe functions.
