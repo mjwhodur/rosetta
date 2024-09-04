@@ -25,6 +25,7 @@ pub type Minute =
 pub type Month =
   Int
 
+/// FIXME - not supported yet
 pub type Offset
 
 /// FIXME - not supported yet

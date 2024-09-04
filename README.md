@@ -18,6 +18,18 @@ Add `rosetta` to your Gleam project.
 gleam add rosetta
 ```
 
+## Porting status
+| Erlang app | Erlang module | Status | Documentation | Description |
+|------------|---------------|--------|---------------|-------------|
+| `erts`     | `erlang`      | alpha       |               |             |
+| `kernel`   | `file`        | not ported       |               |             |
+| `kernel`   | `gen_tcp`     | partially ported       |               |             |
+| `kernel`   | `inet`        | partially ported       |               |             |
+| `ssl`      | `ssl`         | partially ported       |               |             |
+| `stdlib`   | `calendar`    | almost 100% ported, unsafe, not tested       |               | Should be used with caution. Most functions do not test whether values are valid. `Offset` type is not implemented. `Rfc3339String` type is not implemented. |
+| `stdlib`   | `lists`       | not ported       |               |             |
+| `stdlib`   | `math`        | partially ported       |               |             |
+
 ## Modules
 
 ### Datetime
