@@ -1,3 +1,7 @@
+import rosetta/internal/erl/stdlib/r_calendar
+
+pub type Placeholder
+
 /// Represents POSIX error codes (`kernel:posix/0` in Erlang).
 ///
 /// This type provides a direct mapping to POSIX error codes commonly used in UNIX systems
@@ -18,6 +22,9 @@
 /// Note: While these codes originate from POSIX standards, their exact behavior or
 /// availability may vary slightly depending on the underlying system and the specific
 /// Gleam/Erlang libraries being used.
+///
+/// You may also encounter these atoms in other places, like for example `inet`.
+/// This is due to Gleam's limitation: a type can not have fields i.e. from the other type (like in Go, for example)
 pub type PosixError {
   /// Resource temporarily unavailable
   Eagain
@@ -211,3 +218,69 @@ pub type PosixError {
   /// Cross-device link
   Exdev
 }
+
+// Types
+// date_time/0
+pub type DateTime =
+  r_calendar.Datetime
+
+// deep_list/0
+pub type DeepList =
+  Placeholder
+
+// delete_option/0
+pub type DeleteOption =
+  Placeholder
+
+// fd/0
+pub type Fd =
+  Placeholder
+
+// file_info/0
+pub type FileInfo =
+  Placeholder
+
+// file_info_option/0
+pub type FileInfoOption =
+  Placeholder
+
+// filename/0
+pub type Filename =
+  Placeholder
+
+// filename_all/0
+pub type FilenameAll =
+  Placeholder
+
+// io_device/0
+pub type IoDevice =
+  Placeholder
+
+// location/0
+pub type Location =
+  Placeholder
+
+// mode/0
+pub type Mode =
+  Placeholder
+
+// name/0
+pub type Name =
+  Placeholder
+
+// name_all/0
+pub type NameAll =
+  Placeholder
+
+// posix_file_advise/0
+pub type PosixFileAdvise =
+  Placeholder
+
+// read_file_option/0
+pub type ReadFileOption =
+  Placeholder
+
+// sendfile_option/0
+pub type SendfileOption =
+  Placeholder
+// Functions
