@@ -342,7 +342,7 @@ pub fn r_send_2(
   packet packet: Packet,
 ) -> Result(Nil, dynamic.Dynamic)
 
-// shutdown/2
+/// shutdown/2
 @external(erlang, "gen_tcp", "shutdown")
 pub fn r_shutdown_2(
   socket socket: Socket,
