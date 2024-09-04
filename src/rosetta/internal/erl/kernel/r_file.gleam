@@ -1,10 +1,7 @@
-import gleam/dynamic
+import gleam/erlang/process
 import rosetta/improper_results.{type ImproperResultOk}
 import rosetta/internal/erl/erts/r_erlang
 import rosetta/internal/erl/stdlib/r_calendar
-
-pub type Placeholder =
-  dynamic.Dynamic
 
 /// Represents POSIX error codes (`kernel:posix/0` in Erlang).
 ///
@@ -245,9 +242,9 @@ pub type DeleteOption
 /// fd/0
 pub type Fd
 
-// file_info/0
-pub type FileInfo =
-  Placeholder
+/// file_info/0
+/// FIXME: Not Implemented
+pub type FileInfo
 
 /// file_info_option/0
 /// FIXME: Not ported
@@ -260,11 +257,15 @@ pub type Filename =
 /// filename_all/0
 /// For whatever reason this should not be only a string.
 /// In our scenario: String or Binary
-pub type FilenameAll
+/// For sake of simplicity, we treat this as string.
+/// On extremely rare occasions - when the VM is ran in `latin1` the `filename_all` may come as a binary.
+pub type FilenameAll =
+  String
 
 /// io_device/0: Pid or Fd
-/// FIXME: Add conversion to Pid or Fd
-pub type IoDevice
+/// This type is equivalent to `Pid` when the file is *not* opened in raw mode.
+pub type IoDevice =
+  process.Pid
 
 // location/0 - partial translation
 // We lack: integer() | bof | cur | eof impl.
@@ -276,30 +277,44 @@ pub type Location {
 
 // mode/0
 pub type Mode {
+  /// The file, which must exist, is opened for reading.
   Read
+  /// The file is opened for writing. It is created if it does not exist. If the file exists and write is not combined with read, the file is truncated.
   Write
+  /// The file is opened for writing. It is created if it does not exist. Every write operation to a file opened with append takes place at the end of the file.
   Append
+  /// The file is opened for writing. It is created if it does not exist. If the file exists, {error, eexist} is returned.
   Exclusive
+  /// Do NOT use that! We could remove this, but for the sake of completeness this is left here.
+  /// Will cause runtime errors.
   Raw
+  /// Read operations on the file return binaries rather than lists.
   Binary
+  /// Data in subsequent write/2 calls is buffered until at least Size bytes are buffered, or until the oldest buffered data is Delay milliseconds old. Then all buffered data is written in one operating system call. The buffered data is also flushed before some other file operation than write/2 is executed.
+  /// Has side effects. FIXME: Add documentation.
   DelayedWrite(size: Int, delay: Int)
+  /// Makes it possible to read or write gzip compressed files. Option compressed must be combined with read or write, but not both. Notice that the file size obtained with read_file_info/1 does probably not match the number of bytes that can be read from a compressed file.
   Compressed
+  /// Read one member of a gzip compressed file. Option compressed_one can only be combined with read. FIXME: Add detailed information regarding the behaviors
   CompressedOne
   /// Broken
-  Encoding(r_erlang.Any)
+  Encoding
+  /// On platforms supporting it, enables the POSIX O_SYNC synchronous I/O flag or its platform-dependent equivalent (for example, FILE_FLAG_WRITE_THROUGH on Windows) so that writes to the file block until the data is physically written to disk. However, be aware that the exact semantics of this flag differ from platform to platform. For example, none of Linux or Windows guarantees that all file metadata are also written before the call returns. For precise semantics, check the details of your platform documentation. On platforms with no support for POSIX O_SYNC or equivalent, use of the sync flag causes open to return {error, enotsup}.
   Sync
+  /// Allows open to work on directories.
+  Directory
 }
 
 /// name/0
 /// -type name() :: string() | atom() | deep_list().
-/// FIXME: It would be ugly, if we'd simply use it as a string...
-/// TODO: Needs a converter functions.
+/// It's only used in set_cwd. We're leaving this however.
 pub type Name
 
 /// name_all/0
 /// -type name_all() :: string() | atom() | deep_list() | (RawFilename :: binary()).
-/// TODO: May need a helper function to convert between these
-pub type NameAll
+/// In this library, it is only supported as string, as it simplifies many things.
+pub type NameAll =
+  String
 
 // posix_file_advise/0
 pub type PosixFileAdvise {
@@ -455,7 +470,7 @@ pub fn r_eval_1(name name: NameAll) -> ImproperResultOk(PosixError)
 @external(erlang, "file", "eval")
 pub fn r_eval_2(
   arg1: NameAll,
-  arg2: Placeholder,
+  arg2: r_erlang.Any,
 ) -> ImproperResultOk(PosixError)
 
 /// format_error/1
@@ -469,6 +484,7 @@ pub fn r_get_cwd_0() -> Result(String, PosixError)
 
 /// get_cwd/1
 /// UNSAFE
+/// Has broken implementation on platforms that do not support disks (i.e. UNIX)
 @external(erlang, "file", "get_cwd")
 pub fn r_get_cwd_1(drive drive: String) -> Result(Filename, PosixError)
 
@@ -477,6 +493,7 @@ pub fn r_get_cwd_1(drive drive: String) -> Result(Filename, PosixError)
 pub fn r_list_dir_1(dir dir: NameAll) -> Result(List(Filename), PosixError)
 
 /// list_dir_all/1
+/// TODO: In theory: returned List(String) on macOS.
 @external(erlang, "file", "list_dir_all")
 pub fn r_list_dir_all_1(
   dir dir: NameAll,
@@ -517,6 +534,16 @@ pub type Filemodes
 pub type File
 
 /// open/2
+/// Opens file File in the mode determined by Modes, which can contain one or more of the following options:
+///
+/// read - The file, which must exist, is opened for reading.
+///
+/// write - The file is opened for writing. It is created if it does not exist. If the file exists and write is not combined with read, the file is truncated.
+///
+/// append - The file is opened for writing. It is created if it does not exist. Every write operation to a file opened with append takes place at the end of the file.
+///
+/// exclusive - The file is opened for writing. It is created if it does not exist. If the file exists, {error, eexist} is returned.
+/// binary - Read operations on the file return binaries rather than lists.
 /// FIXME: Rewrite this multiple times to workaround with different issues
 @external(erlang, "file", "open")
 pub fn r_open_2(
@@ -554,7 +581,7 @@ pub fn r_path_open_3(
 pub fn r_path_script_2(
   path path: List(NameAll),
   filename filename: NameAll,
-) -> Result(Placeholder, PosixError)
+) -> Result(r_erlang.Any, PosixError)
 
 /// path_script/3
 /// FIXME: I have broken type in bindings. I'm usable, if you'd convert `erl_eval:binding_struct()` to Any
@@ -563,7 +590,7 @@ pub fn r_path_script_3(
   path path: List(NameAll),
   filename filename: NameAll,
   binding bindings: r_erlang.Any,
-) -> Result(Placeholder, PosixError)
+) -> Result(r_erlang.Any, PosixError)
 
 /// position/2
 @external(erlang, "file", "position")
@@ -586,14 +613,16 @@ pub fn r_pread_2(
 
 /// pread/3
 /// UNSAFE: Parameter `number` accepts only non-negative-int
+/// FIXME: Bad Return Type
 @external(erlang, "file", "pread")
 pub fn r_pread_3(
-  iodevice iodevice: Placeholder,
+  iodevice iodevice: IoDevice,
   location location: Location,
   number number: Int,
-) -> Result(Placeholder, PosixError)
+) -> Result(r_erlang.Any, PosixError)
 
 /// pwrite/2
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "pwrite")
 pub fn r_pwrite_2(
   iodevice: IoDevice,
@@ -601,6 +630,7 @@ pub fn r_pwrite_2(
 ) -> ImproperResultOk(#(Int, PosixError))
 
 /// pwrite/3
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "pwrite")
 pub fn r_pwrite_3(
   iodevice iodevice: IoDevice,
@@ -618,9 +648,11 @@ pub type ReadDevice
 /// FIXME: Runtime error when EOF.
 /// It is recommended to use "read_file" instead. At least for now.
 /// UNSAFE: number nust be > 0
+/// WARNING: Our implementation is limited.
+/// RawData is a list (string), when file was not open in binary mode. Binary() otherwise.
 @external(erlang, "file", "read")
 pub fn r_read_2(
-  iodevice iodevice: ReadDevice,
+  iodevice iodevice: IoDevice,
   number number: Int,
 ) -> Result(RawData, PosixError)
 
@@ -631,34 +663,39 @@ pub fn r_read_file_1(
 ) -> Result(r_erlang.Binary, PosixError)
 
 /// read_file/2
-/// FIXME: ReadFileOption may be broken type...
-/// It has only "raw" atom.
+/// Status shall be unsupported.
 @external(erlang, "file", "read_file")
 pub fn r_read_file_2(
   filename filename: NameAll,
-  opts opts: List(ReadFileOption),
+  opts opts: r_erlang.Any,
 ) -> Result(r_erlang.Binary, PosixError)
 
 /// read_file_info/1
 /// name_all() | io_device(),
 /// FIXME: Split or whatever...
 @external(erlang, "file", "read_file_info")
-pub fn r_read_file_info_1(
-  file file: Placeholder,
+pub fn r_read_file_info_by_handle(
+  file file: IoDevice,
+) -> Result(FileInfo, PosixError)
+
+@external(erlang, "file", "read_file_info")
+pub fn r_read_file_info_by_name(
+  file file: NameAll,
 ) -> Result(FileInfo, PosixError)
 
 /// read_file_info/2
-/// FIXME: I'm broken. Split Me
+/// FIXME: I'm broken.
 @external(erlang, "file", "read_file_info")
 pub fn r_read_file_info_2(
-  file file: Placeholder,
-  opts opts: Placeholder,
+  file file: IoDevice,
+  opts opts: r_erlang.Any,
 ) -> Result(FileInfo, PosixError)
 
 /// read_line/1
+/// FIXME: Partial implementation. This does not support any other than files.
 @external(erlang, "file", "read_line")
 pub fn r_read_line_1(
-  iodeevice iodevice: Placeholder,
+  iodeevice iodevice: IoDevice,
 ) -> Result(RawData, PosixError)
 
 /// read_link/1
@@ -681,6 +718,7 @@ pub fn r_read_link_info_2(
 ) -> Result(FileInfo, PosixError)
 
 /// rename/2
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "rename")
 pub fn r_rename_2(
   src src: NameAll,
@@ -719,20 +757,23 @@ pub fn r_sendfile_5(
 ) -> Result(Int, PosixError)
 
 /// set_cwd/1
-/// FIXME: I'm partially supported.
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "set_cwd")
 pub fn r_set_cwd_1(dir dir: String) -> ImproperResultOk(PosixError)
 
 /// sync/1
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "sync")
 pub fn r_sync_1(iodevice iodevice: IoDevice) -> ImproperResultOk(PosixError)
 
 /// truncate/1
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "truncate")
 pub fn r_truncate_1(iodevice iodevice: IoDevice) -> ImproperResultOk(PosixError)
 
 /// write/2
 /// FIXME: We do not support all types of writes, yet.
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "write")
 pub fn r_write_2(
   iodevice iodevice: IoDevice,
@@ -741,6 +782,7 @@ pub fn r_write_2(
 
 /// write_file/2
 /// Writes the contents of the iodata term Bytes to file Filename. The file is created if it does not exist. If it exists, the previous contents are overwritten. Returns ok if successful, otherwise {error, Reason}.
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "write_file")
 pub fn r_write_file_2(
   filename filename: NameAll,
@@ -748,6 +790,7 @@ pub fn r_write_file_2(
 ) -> ImproperResultOk(PosixError)
 
 /// write_file/3
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "write_file")
 pub fn r_write_file_3(
   filename filename: NameAll,
@@ -756,6 +799,7 @@ pub fn r_write_file_3(
 ) -> ImproperResultOk(PosixError)
 
 /// write_file_info/2
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "write_file_info")
 pub fn r_write_file_info_2(
   filename filename: NameAll,
@@ -763,6 +807,7 @@ pub fn r_write_file_info_2(
 ) -> ImproperResultOk(PosixError)
 
 /// write_file_info/3
+/// Returns ImproperResultOk. If you want to unwrap the result use generic function `convert_improper_result` from `rosetta/improper_reults`
 @external(erlang, "file", "write_file_info")
 pub fn r_write_file_info_3(
   filename filename: NameAll,

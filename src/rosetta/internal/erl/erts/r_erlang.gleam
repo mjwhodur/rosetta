@@ -1120,26 +1120,26 @@ pub type TracePatternMfa =
 // universaltime/0
 // universaltime_to_localtime/1
 
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_to_nonnegative_int(value: Int) -> NonNegInteger
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_nonneg_to_integer(value: NonNegInteger) -> Int
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_neg_to_integer(value: NegInteger) -> Int
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_number_to_integer(value: Number) -> Int
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_to_any_to_number(value: Any) -> Number
-
 pub fn int_to_nonnegative_int(
   value: Int,
 ) -> Result(NonNegInteger, ConversionError) {
   case value >= 0 {
-    True -> Ok(idx_to_nonnegative_int(value))
+    True -> Ok(unsafe_cast(value))
     False -> Error(NegativeIntegerError)
   }
 }
+
+@deprecated("This function is unsafe. As it omits sanity check")
+@external(erlang, "rosetta_core_ffi", "ident")
+pub fn int_to_nonnegative_int_unsafe(value: Int) -> NonNegInteger
+
+pub fn float_to_number(value: Float) -> Number {
+  unsafe_cast(value)
+}
+
+pub fn int_to_number(value: Int) -> Number {
+  unsafe_cast(value)
+}
+
+@external(erlang, "rosetta_core_ffi", "ident")
+pub fn unsafe_cast(value: typefrom) -> typeto
