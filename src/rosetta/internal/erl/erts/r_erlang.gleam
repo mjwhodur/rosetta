@@ -1123,14 +1123,6 @@ fn idx_number_to_integer(value: Number) -> Int
 @external(erlang, "rosetta_core_ffi", "ident")
 fn idx_to_any_to_number(value: Any) -> Number
 
-pub fn number_to_float(num: Number) -> Float {
-  todo
-}
-
-pub fn number_to_int(num: Number) -> Int {
-  todo
-}
-
 pub fn int_to_nonnegative_int(
   value: Int,
 ) -> Result(NonNegInteger, ConversionError) {
