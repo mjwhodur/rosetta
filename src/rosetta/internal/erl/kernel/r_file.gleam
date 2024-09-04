@@ -1,4 +1,5 @@
 import gleam/dynamic
+import rosetta/internal/erl/erts/r_erlang
 import rosetta/internal/erl/stdlib/r_calendar
 
 pub type Placeholder =
@@ -27,6 +28,7 @@ pub type Placeholder =
 ///
 /// You may also encounter these atoms in other places, like for example `inet`.
 /// This is due to Gleam's limitation: a type can not have fields i.e. from the other type (like in Go, for example)
+/// This type extends, however, Erlang's `posix/0` by adding `badarg` atom.
 pub type PosixError {
   /// Resource temporarily unavailable
   Eagain
@@ -219,6 +221,8 @@ pub type PosixError {
   Estale
   /// Cross-device link
   Exdev
+  /// Not from POSIX. It's an erlang atom that may be thrown in certain scenarios.
+  Badarg
 }
 
 // Types
@@ -226,76 +230,104 @@ pub type PosixError {
 pub type DateTime =
   r_calendar.Datetime
 
-// deep_list/0
-pub type DeepList =
-  Placeholder
+/// deep_list/0
+/// Not yet implemented.
+pub type DeepList
 
-// delete_option/0
-pub type DeleteOption =
-  Placeholder
+/// delete_option/0
+pub type DeleteOption
 
-// fd/0
-pub type Fd =
-  Placeholder
+/// fd/0
+pub type Fd
 
 // file_info/0
 pub type FileInfo =
   Placeholder
 
-// file_info_option/0
-pub type FileInfoOption =
-  Placeholder
+/// file_info_option/0
+/// FIXME: Not ported
+pub type FileInfoOption
 
-// filename/0
+/// filename/0
 pub type Filename =
-  Placeholder
+  String
 
-// filename_all/0
-pub type FilenameAll =
-  Placeholder
+/// filename_all/0
+/// For whatever reason this should not be only a string.
+/// In our scenario: String or Binary
+pub type FilenameAll
 
-// io_device/0
-pub type IoDevice =
-  Placeholder
+/// io_device/0: Pid or Fd
+/// FIXME: Add conversion to Pid or Fd
+pub type IoDevice
 
-// location/0
-pub type Location =
-  Placeholder
+// location/0 - partial translation
+// We lack: integer() | bof | cur | eof impl.
+pub type Location {
+  Bof(offset: Int)
+  Cur(offset: Int)
+  Eof(offset: Int)
+}
 
 // mode/0
-pub type Mode =
-  Placeholder
+pub type Mode {
+  Read
+  Write
+  Append
+  Exclusive
+  Raw
+  Binary
+  DelayedWrite(size: Int, delay: Int)
+  Compressed
+  CompressedOne
+  /// Broken
+  Encoding(r_erlang.Any)
+  Sync
+}
 
-// name/0
-pub type Name =
-  Placeholder
+/// name/0
+/// -type name() :: string() | atom() | deep_list().
+/// FIXME: It would be ugly, if we'd simply use it as a string...
+/// TODO: Needs a converter functions.
+pub type Name
 
-// name_all/0
-pub type NameAll =
-  Placeholder
+/// name_all/0
+/// -type name_all() :: string() | atom() | deep_list() | (RawFilename :: binary()).
+/// TODO: May need a helper function to convert between these
+pub type NameAll
 
 // posix_file_advise/0
-pub type PosixFileAdvise =
-  Placeholder
+pub type PosixFileAdvise {
+  Normal
+  Sequential
+  Random
+  NoReuse
+  WillNeed
+  DontNeed
+}
 
-// read_file_option/0
-pub type ReadFileOption =
-  Placeholder
+/// Supports only "Raw"... But due to Gleam's limitations we have to workaround this FIXME
+pub type ReadFileOption
 
 // sendfile_option/0
-pub type SendfileOption =
-  Placeholder
+pub type SendfileOption {
+  ChunkSize(val: r_erlang.NonNegInteger)
+  UseThreads(Bool)
+}
 
 // Functions
 
-/// advise/4
+/// `advise/4`
+/// `advise/4` can be used to announce an intention to access file data in a specific pattern in the future, thus allowing the operating system to perform appropriate optimizations.
+/// On some platforms, this function might have no effect.
+/// FIXME: Can result in `badarg` which is not yet supported here.
 @external(erlang, "file", "advise")
 pub fn r_advise_4(
-  arg1: Placeholder,
-  arg2: Placeholder,
-  arg3: Placeholder,
-  arg4: Placeholder,
-) -> Placeholder
+  iodevice iodevice: IoDevice,
+  offset offset: Int,
+  length length: Int,
+  advise advise: PosixFileAdvise,
+) -> Result(Nil, PosixError)
 
 /// allocate/3
 @external(erlang, "file", "allocate")
