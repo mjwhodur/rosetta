@@ -1,8 +1,7 @@
-/////// This Gleam module aims to represent everything that there is in erts/erlang module
-/////// It is not recommended to rely on any of these types here
-/////// Functions prepended with r_ are their erlang counterparts, translated here for brevity
+//// This Gleam module aims to represent everything that there is in erts/erlang module
+//// It is not recommended to rely on any of these types here
+//// Functions prepended with r_ are their erlang counterparts, translated here for brevity
 
-import gleam/dynamic.{type Dynamic}
 import gleam/erlang/atom.{type Atom}
 import gleam/erlang/node.{type Node}
 import gleam/erlang/process
