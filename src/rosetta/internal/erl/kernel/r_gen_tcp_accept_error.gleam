@@ -1,0 +1,32 @@
+pub type AcceptError {
+  Closed
+  SystemLimit
+  Eaddrinuse
+  Eaddrnotavail
+  Eafnosupport
+  Ealready
+  Econnaborted
+  Econnrefused
+  Econnreset
+  Edestaddrreq
+  Ehostdown
+  Ehostunreach
+  Einprogress
+  Eisconn
+  Emsgsize
+  Enetdown
+  Enetunreach
+  Enopkg
+  Enoprotoopt
+  Enetconn
+  Enotty
+  Enotsock
+  Eproto
+  Eprotonosupport
+  Eprototype
+  Esocktnosupport
+  Etimedout
+  Ewouldblock
+  Exbadport
+  Exbadseq
+}
