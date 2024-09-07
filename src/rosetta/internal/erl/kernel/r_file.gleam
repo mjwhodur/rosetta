@@ -5,27 +5,39 @@ import rosetta/internal/erl/stdlib/r_calendar
 
 /// Represents POSIX error codes (`kernel:posix/0` in Erlang).
 ///
-/// This type provides a direct mapping to POSIX error codes commonly used in UNIX systems
-/// and many C compiler runtime libraries. These codes are used to indicate various
-/// system-level errors that can occur during operations such as file I/O, network
+/// This type provides a direct mapping to POSIX error codes commonly used in
+/// UNIX systems
+/// and many C compiler runtime libraries. These codes are used to indicate
+/// various
+/// system-level errors that can occur during operations such as file I/O,
+/// network
 /// communication, and process management.
 ///
-/// POSIX (Portable Operating System Interface) is a family of standards specified by the
-/// IEEE Computer Society for maintaining compatibility between operating systems. These
-/// error codes are part of that standard, ensuring consistent error reporting across
+/// POSIX (Portable Operating System Interface) is a family of standards
+/// specified by the
+/// IEEE Computer Society for maintaining compatibility between operating
+/// systems. These
+/// error codes are part of that standard, ensuring consistent error reporting
+/// across
 /// different POSIX-compliant systems.
 ///
-/// When working with system calls or libraries that interact closely with the operating
-/// system, functions may return these error codes to indicate specific failure conditions.
-/// Understanding these codes can help in diagnosing issues and handling errors appropriately
+/// When working with system calls or libraries that interact closely with the
+/// operating
+/// system, functions may return these error codes to indicate specific failure
+/// conditions.
+/// Understanding these codes can help in diagnosing issues and handling errors
+/// appropriately
 /// in your application.
 ///
-/// Note: While these codes originate from POSIX standards, their exact behavior or
-/// availability may vary slightly depending on the underlying system and the specific
+/// Note: While these codes originate from POSIX standards, their exact behavior
+///  or
+/// availability may vary slightly depending on the underlying system and the
+/// specific
 /// Gleam/Erlang libraries being used.
 ///
 /// You may also encounter these atoms in other places, like for example `inet`.
-/// This is due to Gleam's limitation: a type can not have fields i.e. from the other type (like in Go, for example)
+/// This is due to Gleam's limitation: a type can not have fields i.e. from the
+/// other type (like in Go, for example).
 /// This type extends, however, Erlang's `posix/0` by adding `badarg` atom.
 pub type PosixError {
   /// Resource temporarily unavailable
@@ -110,7 +122,8 @@ pub type PosixError {
   /// Common scenarios:
   /// - Attempting to send data through a socket when network buffers are full
   /// - Creating new sockets when the system has reached its resource limits
-  /// - Operations on message queues when there's insufficient memory for buffering
+  /// - Operations on message queues when there's insufficient memory for
+  /// buffering
   ///
   /// Possible causes:
   /// - System overload
@@ -131,7 +144,8 @@ pub type PosixError {
   /// in distributed file systems or network-related operations.
   ///
   /// Common scenarios:
-  /// - Attempting to access a remote file system resource that is no longer available
+  /// - Attempting to access a remote file system resource that is no longer
+  ///   available
   /// - Network connection interruptions in distributed systems
   ///
   /// Note: This error is closely related to operations in network file systems.
@@ -142,10 +156,12 @@ pub type PosixError {
   /// cannot acquire a lock on a file due to system limits.
   ///
   /// Common scenarios:
-  /// - Attempting to lock a file when the system's maximum number of locks is reached
+  /// - Attempting to lock a file when the system's maximum number of locks is
+  ///   reached
   /// - Issues with file locking mechanisms in the operating system
   ///
-  /// Note: This error is often encountered in systems with heavy file I/O operations.
+  /// Note: This error is often encountered in systems with heavy file I/O
+  /// operations.
   Enolck
   /// Not enough memory
   Enomem
@@ -153,8 +169,8 @@ pub type PosixError {
   Enospc
   /// Out of streams resources
   /// NOT DOCUMENTED IN ERLANG
-  /// Indicates that the system is out of STREAMS resources. This error is specific
-  /// to systems that implement STREAMS I/O.
+  /// Indicates that the system is out of STREAMS resources. This error is
+  /// specific to systems that implement STREAMS I/O.
   ///
   /// Common scenarios:
   /// - Attempting to open a STREAMS device when all STREAMS resources are exhausted
@@ -168,10 +184,12 @@ pub type PosixError {
   /// Indicates that the function is not implemented on the current system.
   ///
   /// Common scenarios:
-  /// - Calling a system call or library function that is not supported by the OS
+  /// - Calling a system call or library function that is not supported by the
+  /// OS
   /// - Attempting to use a feature that is not available in the current environment
   ///
-  /// Note: This error is important for maintaining portability across different systems.
+  /// Note: This error is important for maintaining portability across different
+  /// systems.
   Enosys
   /// Not a STREAM
   /// NOT DOCUMENTED IN ERLANG
@@ -199,9 +217,11 @@ pub type PosixError {
   ///
   /// Common scenarios:
   /// - Attempting to store a value in a variable that exceeds its maximum size
-  /// - File operations where a file size or offset exceeds the maximum allowed value
+  /// - File operations where a file size or offset exceeds the maximum allowed
+  ///   value
   ///
-  /// Note: This error is important in systems programming and data processing tasks.
+  /// Note: This error is important in systems programming and data processing
+  /// tasks.
   Eoverflow
   /// Not owner
   Eperm
@@ -258,7 +278,8 @@ pub type Filename =
 /// For whatever reason this should not be only a string.
 /// In our scenario: String or Binary
 /// For sake of simplicity, we treat this as string.
-/// On extremely rare occasions - when the VM is ran in `latin1` the `filename_all` may come as a binary.
+/// On extremely rare occasions - when the VM is ran in `latin1` the `filename_all`
+/// may come as a binary.
 pub type FilenameAll =
   String
 
@@ -279,40 +300,65 @@ pub type Location {
 pub type Mode {
   /// The file, which must exist, is opened for reading.
   Read
-  /// The file is opened for writing. It is created if it does not exist. If the file exists and write is not combined with read, the file is truncated.
+  /// The file is opened for writing. It is created if it does not exist.
+  /// If the file exists and write is not combined with read, the file is
+  /// truncated.
   Write
-  /// The file is opened for writing. It is created if it does not exist. Every write operation to a file opened with append takes place at the end of the file.
+  /// The file is opened for writing. It is created if it does not exist.
+  /// Every write operation to a file opened with append takes place at the
+  /// end of the file.
   Append
-  /// The file is opened for writing. It is created if it does not exist. If the file exists, {error, eexist} is returned.
+  /// The file is opened for writing. It is created if it does not exist.
+  /// If the file exists, {error, eexist} is returned.
   Exclusive
-  /// Do NOT use that! We could remove this, but for the sake of completeness this is left here.
+  /// Do NOT use that! We could remove this, but for the sake of completeness
+  /// this is left here.
   /// Will cause runtime errors.
   Raw
   /// Read operations on the file return binaries rather than lists.
   Binary
-  /// Data in subsequent write/2 calls is buffered until at least Size bytes are buffered, or until the oldest buffered data is Delay milliseconds old. Then all buffered data is written in one operating system call. The buffered data is also flushed before some other file operation than write/2 is executed.
+  /// Data in subsequent write/2 calls is buffered until at least Size bytes
+  /// are buffered, or until the oldest buffered data is Delay milliseconds old.
+  ///  Then all buffered data is written in one operating system call.
+  ///  The buffered data is also flushed before some other file operation than
+  ///  write/2 is executed.
   /// Has side effects. FIXME: Add documentation.
   DelayedWrite(size: Int, delay: Int)
-  /// Makes it possible to read or write gzip compressed files. Option compressed must be combined with read or write, but not both. Notice that the file size obtained with read_file_info/1 does probably not match the number of bytes that can be read from a compressed file.
+  /// Makes it possible to read or write gzip compressed files. Option
+  /// compressed must be combined with read or write, but not both. Notice that
+  /// the file size obtained with read_file_info/1 does probably not match the
+  /// number of bytes that can be read from a compressed file.
   Compressed
-  /// Read one member of a gzip compressed file. Option compressed_one can only be combined with read. FIXME: Add detailed information regarding the behaviors
+  /// Read one member of a gzip compressed file. Option compressed_one can only
+  /// be combined with read. FIXME: Add detailed information regarding the
+  /// behaviors
   CompressedOne
   /// Broken
   Encoding
-  /// On platforms supporting it, enables the POSIX O_SYNC synchronous I/O flag or its platform-dependent equivalent (for example, FILE_FLAG_WRITE_THROUGH on Windows) so that writes to the file block until the data is physically written to disk. However, be aware that the exact semantics of this flag differ from platform to platform. For example, none of Linux or Windows guarantees that all file metadata are also written before the call returns. For precise semantics, check the details of your platform documentation. On platforms with no support for POSIX O_SYNC or equivalent, use of the sync flag causes open to return {error, enotsup}.
+  /// On platforms supporting it, enables the POSIX O_SYNC synchronous I/O flag
+  ///  or its platform-dependent equivalent (i.e., FILE_FLAG_WRITE_THROUGH on
+  ///  Windows) so that writes to the file block until the data is physically
+  ///  written to disk. However, be aware that the exact semantics of this flag
+  /// differ from platform to platform. For example, none of Linux or Windows
+  /// guarantees that all file metadata are also written before the call
+  /// returns. For precise semantics, check the details of your platform
+  /// documentation. On platforms with no support for POSIX O_SYNC or equivalent,
+  /// use of the sync flag causes open to return {error, enotsup}.
   Sync
   /// Allows open to work on directories.
   Directory
 }
 
-/// name/0
+/// `name/0`
 /// -type name() :: string() | atom() | deep_list().
 /// It's only used in set_cwd. We're leaving this however.
+/// CAVEAT: In Erlang, filename can be of type Atom.
 pub type Name
 
 /// name_all/0
-/// -type name_all() :: string() | atom() | deep_list() | (RawFilename :: binary()).
-/// In this library, it is only supported as string, as it simplifies many things.
+/// `name_all() :: string() | atom() | deep_list() | (RawFilename :: binary())`
+/// In this library, it is only supported as string, as it simplifies many
+/// things.
 pub type NameAll =
   String
 
@@ -326,7 +372,9 @@ pub type PosixFileAdvise {
   DontNeed
 }
 
-/// Supports only "Raw"... But due to Gleam's limitations we have to workaround this FIXME
+/// Supports only "Raw"... But due to Gleam's limitations we have to workaround
+/// this FIXME
+/// Leftover
 pub type ReadFileOption
 
 // sendfile_option/0
@@ -338,7 +386,9 @@ pub type SendfileOption {
 // Functions
 
 /// `advise/4`
-/// `advise/4` can be used to announce an intention to access file data in a specific pattern in the future, thus allowing the operating system to perform appropriate optimizations.
+/// `advise/4` can be used to announce an intention to access file data in a
+/// specific pattern in the future, thus allowing the operating system to
+/// perform appropriate optimizations.
 /// On some platforms, this function might have no effect.
 /// UNSAFE.
 @external(erlang, "file", "advise")
@@ -352,7 +402,8 @@ pub fn r_advise_4(
 /// allocate/3
 /// allocate/3 can be used to preallocate space for a file.
 /// This function only succeeds in platforms that provide this feature.
-/// UNSAFE: This function is unsafe. `offset` and `length` should provide non-negative integer.
+/// UNSAFE: This function is unsafe. `offset` and `length` should provide
+/// non-negative integer.
 @external(erlang, "file", "allocate")
 pub fn r_allocate_3(
   file file: IoDevice,
@@ -534,20 +585,31 @@ pub type Filemodes
 pub type File
 
 /// open/2
-/// Opens file File in the mode determined by Modes, which can contain one or more of the following options:
+/// Opens file File in the mode determined by Modes, which can contain one or
+/// more of the following options:
 ///
 /// read - The file, which must exist, is opened for reading.
 ///
-/// write - The file is opened for writing. It is created if it does not exist. If the file exists and write is not combined with read, the file is truncated.
+/// write - The file is opened for writing. It is created if it does not exist.
+/// If the file exists and write is not combined with read, the file is truncated.
 ///
-/// append - The file is opened for writing. It is created if it does not exist. Every write operation to a file opened with append takes place at the end of the file.
+/// append - The file is opened for writing. It is created if it does not exist.
+/// Every write operation to a file opened with append takes place at the end
+/// of the file.
 ///
-/// exclusive - The file is opened for writing. It is created if it does not exist. If the file exists, {error, eexist} is returned.
+/// exclusive - The file is opened for writing. It is created if it does not
+/// exist. If the file exists, {error, eexist} is returned.
 /// binary - Read operations on the file return binaries rather than lists.
 /// FIXME: Rewrite this multiple times to workaround with different issues
 @external(erlang, "file", "open")
 pub fn r_open_2(
   file file: File,
+  modes modes: Filemodes,
+) -> Result(IoDevice, PosixError)
+
+@external(erlang, "file", "open")
+pub fn r_open_2_with_filename(
+  file file: NameAll,
   modes modes: Filemodes,
 ) -> Result(IoDevice, PosixError)
 
