@@ -122,11 +122,13 @@ pub type ListenError {
 // list | binary |
 // {nodelay, boolean()} |
 // {packet,
-//  0 | 1 | 2 | 4 | raw | sunrm | asn1 | cdr | fcgi | line | tpkt | http | httph | http_bin |
+//  0 | 1 | 2 | 4 | raw | sunrm | asn1 | cdr | fcgi | line | tpkt | http | httph
+//  | http_bin |
 //  httph_bin} |
 // {packet_size, non_neg_integer()} |
 // {priority, non_neg_integer()} |
-// {raw, Protocol :: non_neg_integer(), OptionNum :: non_neg_integer(), ValueBin :: binary()} |
+// {raw, Protocol :: non_neg_integer(), OptionNum :: non_neg_integer(), ValueBin
+//  :: binary()} |
 // {recbuf, non_neg_integer()} |
 // {reuseaddr, boolean()} |
 // {reuseport, boolean()} |
@@ -145,7 +147,8 @@ pub type ListenError {
 
 /// {fd, Fd :: non_neg_integer()} |
 ///          inet:address_family() |
-///          {ifaddr, socket:sockaddr_in() | socket:sockaddr_in6() | inet:socket_address()} |
+///          {ifaddr, socket:sockaddr_in() | socket:sockaddr_in6() |
+///           inet:socket_address()} |
 ///          {ip, inet:socket_address()} |
 ///          {port, inet:port_number()} |
 ///          {backlog, B :: non_neg_integer()} |
@@ -173,11 +176,13 @@ pub type ListenError {
 /// list | binary |
 /// {nodelay, boolean()} |
 /// {packet,
-///  0 | 1 | 2 | 4 | raw | sunrm | asn1 | cdr | fcgi | line | tpkt | http | httph | http_bin |
+///  0 | 1 | 2 | 4 | raw | sunrm | asn1 | cdr | fcgi | line | tpkt | http |
+///  httph | http_bin |
 ///  httph_bin} |
 /// {packet_size, non_neg_integer()} |
 /// {priority, non_neg_integer()} |
-/// {raw, Protocol :: non_neg_integer(), OptionNum :: non_neg_integer(), ValueBin :: binary()} |
+/// {raw, Protocol :: non_neg_integer(), OptionNum :: non_neg_integer(),
+///  ValueBin :: binary()} |
 /// {recbuf, non_neg_integer()} |
 /// {reuseaddr, boolean()} |
 /// {reuseport, boolean()} |
@@ -194,7 +199,8 @@ pub type ListenError {
 /// {recvttl, boolean()} |
 /// {ipv6_v6only, boolean()}.
 pub type ListenOptions {
-  /// SAME AS IN r_gen_tcp_options.gleam, but it is an ugly hack because the Gleam does not support redefining types
+  /// SAME AS IN r_gen_tcp_options.gleam, but it is an ugly hack because the
+  /// Gleam does not support redefining types
   /// This option is not fully supported
   Active(Bool)
   /// This option accepts non-negative integer
@@ -231,7 +237,8 @@ pub type ListenOptions {
   Reuseaddr(Bool)
   Reuseport(Bool)
   ReuseportLb(Bool)
-  /// Send Timeout set to non-neg integer. If infinity is desired, omit this option
+  /// Send Timeout set to non-neg integer. If infinity is desired, omit this
+  /// option
   SendTimeout(Int)
   SendTimeoutClose(Bool)
   ShowEconnreset(Bool)
@@ -309,7 +316,8 @@ pub fn r_close_1(socket socket: Socket) -> Nil
 // connect/3
 // connect/4
 /// controlling_process/2
-/// Partially broken implementation. Does not resolve with correct error. Error can be unpacked manually
+/// Partially broken implementation. Does not resolve with correct error. Error
+/// can be unpacked manually
 @external(erlang, "gen_tcp", "controlling_process")
 pub fn r_controlling_process_2(
   socket socket: Socket,
@@ -323,8 +331,14 @@ pub fn r_recv_2(socket: Socket, length: Int) -> Result(Packet, dynamic.Dynamic)
 
 /// recv/3
 /// Receive a packet, from a socket in passive mode.
-///A closed socket is indicated by the return value {error, closed}. If the socket is not in passive mode, the return value is {error, einval}.
-///Argument Length is only meaningful when the socket is in raw mode and denotes the number of bytes to read. If Length is 0, all available bytes are returned. If Length > 0, exactly Length bytes are returned, or an error; except if the socket is closed from the other side, then the last read before the one returning {error, closed} may return less than Length bytes of data.
+///A closed socket is indicated by the return value {error, closed}. If the
+/// socket is not in passive mode, the return value is {error, einval}.
+///Argument Length is only meaningful when the socket is in raw mode and denotes
+/// the number of bytes to read. If Length is 0, all available bytes are
+/// returned. If Length > 0, exactly Length bytes are returned, or an error;
+/// except if the socket is closed from the other side, then the last read
+/// before the one returning {error, closed} may return less than Length bytes
+/// of data.
 @external(erlang, "gen_tcp", "recv")
 pub fn r_recv_3(
   socket: Socket,
@@ -335,7 +349,11 @@ pub fn r_recv_3(
 /// send/2
 /// Send a packet on a socket.
 /// Non-blocking send.
-/// When using inet_backend = socket, the behaviour is different. There is no buffering, instead the caller will "hang" until all of the data has been sent or the send timeout (as specified by the send_timeout option) expires (the function can "hang" even when using the inet backend if the internal buffers are full).
+/// When using inet_backend = socket, the behaviour is different. There is no
+/// buffering, instead the caller will "hang" until all of the data has been
+/// sent or the send timeout (as specified by the send_timeout option) expires
+/// (the function can "hang" even when using the inet backend if the internal
+/// buffers are full).
 @external(erlang, "gen_tcp", "send")
 pub fn r_send_2(
   socket socket: Socket,
