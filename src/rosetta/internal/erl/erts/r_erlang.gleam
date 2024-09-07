@@ -2,18 +2,23 @@
 //// It is not recommended to rely on any of these types here
 //// Functions prepended with r_ are their erlang counterparts, translated here for brevity
 
+import gleam/erlang
 import gleam/erlang/atom.{type Atom}
 import gleam/erlang/node.{type Node}
+import gleam/erlang/port.{type Port}
 import gleam/erlang/process
+import rosetta
 
 pub type ConversionError {
   NegativeIntegerError
 }
 
+/// Alias type for `pid/0`
 pub type RPid =
   process.Pid
 
 /// It represents the Erlang `any/0` Type
+/// TODO: Check if it's not clashing with any of the Standard Library types
 pub type Any
 
 /// Represents `arity/0`
@@ -57,14 +62,18 @@ pub type RIdentifier =
   Identifier
 
 /// `integer/0`, equivalent of `Int` in Gleam.
-/// The "integer" type in Erlang has two subvariants: `non_neg_integer` and `neg_integer`.
+/// The "integer" type in Erlang has three subvariants: `non_neg_integer` and
+/// `neg_integer` and `pos_integer`.
 /// Those are defined separately.
 pub type Integer =
   Int
 
-///A binary or list containing bytes and/or iodata.
-///This datatype is used to represent data that is meant to be output using any I/O module. For example: file:write/2 or gen_tcp:send/2.
-///To convert an iodata/0 term to binary/0 you can use iolist_to_binary/2. To transcode a string/0 or unicode:chardata/0 to iodata/0 you can use unicode:characters_to_binary/1.
+/// A binary or list containing bytes and/or iodata.
+/// This datatype is used to represent data that is meant to be output using any
+/// I/O module. For example: file:write/2 or gen_tcp:send/2.
+/// To convert an iodata/0 term to binary/0 you can use iolist_to_binary/2.
+/// To transcode a string/0 or unicode:chardata/0 to iodata/0 you can use
+/// unicode:characters_to_binary/1.
 pub type IoData
 
 ///-type iolist() :: maybe_improper_list(byte() | binary() | iolist(), binary() | []).
@@ -92,11 +101,17 @@ pub type RMap
 /// An Erlang list that is not guaranteed to end with a [], and where the list elements can be of any type.
 pub type MaybeImproperList
 
-///
-pub type MaybeImproperList2
+/// `nonempty_maybe_improper_list/0`
+/// A `maybe_improper_list/0` that contains some items.
+pub type NonemptyMaybeImproperList
+
+/// An Erlang list that is not guaranteed to end with a [], and where the list elements can be of any type.
+/// Conforms to `maybe_improper_list/2`
+pub type MaybeImproperTypedList(valuetype)
 
 /// A three-tuple representing a Module:Function/Arity function signature.
-pub type Mfa
+pub type Mfa =
+  #(Module, RFunction, Arity)
 
 /// An Erlang module represented by an atom.
 pub type Module
@@ -115,13 +130,16 @@ pub type NoReturn
 pub type RNode =
   Node
 
-/// A non-negative integer, that is any positive integer or 0. FIXME: add conversions
+/// A non-negative integer, that is any positive integer or 0.
+/// FIXME: add conversions
 pub type NonNegInteger
 
-/// Integer greater than 0. FIXME: Add Conversions
+/// Integer greater than 0.
+/// FIXME: Add Conversions
 pub type PosInteger
 
-/// `none/0`
+/// `none/0` Gleam has its own None type, but it compiles to `nil` atom. That is
+/// why we are leaving this here, as some internal representations use that.
 pub type RNone
 
 /// `binary/0` (`Binary`) that contains some data.
@@ -157,7 +175,7 @@ pub type AnyList
 /// so are omitted in this file.
 pub type Identifier
 
-/// In Erlang
+/// Synonym for Any
 pub type Term =
   Any
 
@@ -169,6 +187,12 @@ pub type RTuple
 
 /// Our crazy internal type, to sign that something is not yet ready.
 pub type HelpMeNotTyped
+
+pub type RPort =
+  Port
+
+pub type RReference =
+  erlang.Reference
 
 ///append_element/2
 @deprecated("This has no tests")
@@ -208,10 +232,11 @@ pub fn r_floor_1(value: Number) -> Int
 @external(erlang, "erlang", "fun_to_list")
 pub fn r_fun_to_list_1(value: Any) -> String
 
-/// hd/1
-@deprecated("Likely buggy implementation")
+/// hd/1 - returns head of the list.
+/// WARNING: Returns `badarg` when value is an empty List.
+@deprecated("Lacking tests")
 @external(erlang, "erlang", "hd")
-pub fn r_hd_1(value: AnyList) -> Any
+pub fn r_hd_1(value: NonemptyMaybeImproperList) -> Any
 
 /// insert_element/3
 @external(erlang, "erlang", "insert_element")
@@ -759,6 +784,7 @@ pub type HaltOption {
 pub type InfoList =
   RNil
 
+/// Type representing `iovec/0`
 pub type Iovec =
   List(Binary)
 
@@ -1108,26 +1134,23 @@ pub type TracePatternMfa =
 // universaltime/0
 // universaltime_to_localtime/1
 
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_to_nonnegative_int(value: Int) -> NonNegInteger
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_nonneg_to_integer(value: NonNegInteger) -> Int
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_neg_to_integer(value: NegInteger) -> Int
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_number_to_integer(value: Number) -> Int
-
-@external(erlang, "rosetta_core_ffi", "ident")
-fn idx_to_any_to_number(value: Any) -> Number
-
 pub fn int_to_nonnegative_int(
   value: Int,
 ) -> Result(NonNegInteger, ConversionError) {
   case value >= 0 {
-    True -> Ok(idx_to_nonnegative_int(value))
+    True -> Ok(rosetta.unsafe_cast(value))
     False -> Error(NegativeIntegerError)
   }
+}
+
+@deprecated("This function is unsafe. As it omits sanity check")
+@external(erlang, "rosetta_core_ffi", "ident")
+pub fn int_to_nonnegative_int_unsafe(value: Int) -> NonNegInteger
+
+pub fn float_to_number(value: Float) -> Number {
+  rosetta.unsafe_cast(value)
+}
+
+pub fn int_to_number(value: Int) -> Number {
+  rosetta.unsafe_cast(value)
 }
